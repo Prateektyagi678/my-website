@@ -3,13 +3,53 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ServiceNow OpenFrame Test Adapter (No Cisco)</title>
+  <title>OpenFrame GitHub Adapter Test</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 12px; }
-    h2 { margin: 0 0 8px; }
-    .hint { font-size: 12px; color: #555; margin: 6px 0 12px; }
+    .hint { font-size: 12px; color: #555; margin: 6px 0 10px; }
     label { display:block; margin-top: 10px; font-weight: 600; }
     input, textarea, button { width: 100%; padding: 10px; margin-top: 6px; box-sizing: border-box; }
-    textarea { height: 140px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    textarea { height: 120px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>OpenFrame GitHub Adapter (Different Origin Test)</h2>
+  <div class="hint">
+    This page is hosted on GitHub Pages (different origin) and loaded inside ServiceNow OpenFrame.
+  </div>
+
+  <div class="row">
+    <button id="btnInit">1) Init OpenFrame</button>
+    <button id="btnCreate">2) Create Incident + Screen Pop</button>
+  </div>
+
+  <label>ServiceNow Instance Base URL</label>
+  <input id="snBase" value="https://dev393388.service-now.com" />
+
+  <label>Integration Username (Basic Auth test)</label>
+  <input id="snUser" placeholder="integration user" />
+
+  <label>Integration Password</label>
+  <input id="snPass" type="password" placeholder="password" />
+
+  <label>Incident Payload (JSON)</label>
+  <textarea id="payload">
+{
+  "short_description": "OpenFrame GitHub origin test",
+  "description": "Created from GitHub Pages adapter via Table API.",
+  "contact_type": "phone"
+}
+  </textarea>
+
+  <label>Log</label>
+  <textarea id="log" readonly></textarea>
+
+  <!-- Load OpenFrame API from the ServiceNow instance (latest minified path). [10](https://www.servicenow.com/docs/r/api-reference/api-reference.html)[11](https://bing.com/search?q=ServiceNow+documentation+CORS+Rules+create+CORS+rule+System+Web+Services+REST+CORS+Rules+domain+methods+headers+allow+credentials) -->
+  <script src="https://dev393388.service-now.com/scripts/openframe/latest/openFrameAPI.min.js"></script>
+
+  <script src="./adapter.js"></script>
+</body>
+</html>
+``
