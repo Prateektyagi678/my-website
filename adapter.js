@@ -1,121 +1,105 @@
 (function () {
-  let initialized = false;
-  let lastIncidentSysId = null;
-
-  // Use the endpoint you requested:
-  // ServiceNow Table API supports default URL: /api/now/table/{tableName} [1](https://www.servicenow.com/docs/r/api-reference/rest-apis/c_TableAPI.html)
-  const INCIDENT_POST_URL = "https://dev393388.service-now.com/api/now/table/incident";
+  var initialized = false;
 
   function log(msg) {
-    const box = document.getElementById("log");
-    box.value += `[${new Date().toISOString()}] ${msg}\n`;
+    var box = document.getElementById("log");
+    var line = "[" + new Date().toISOString() + "] " + (msg || "") + "\n";
+    box.value = box.value + line;
     box.scrollTop = box.scrollHeight;
+    try { console.log(msg); } catch (e) {}
   }
 
-  function getApi() {
-    return window.openFrameAPI || null;
-  }
-
-  // 1) Init OpenFrame
   function initOpenFrame() {
-    const api = getApi();
-    if (!api) {
-      log("ERROR: openFrameAPI not loaded. Check script tag in index.html.");
+    if (!window.openFrameAPI) {
+      log("ERROR: openFrameAPI not loaded.");
       return;
     }
 
-    // init() must be the first OpenFrame API method called. [2](https://developer.cisco.com/docs/finesse/getting-started/)
-    const config = { width: 420, height: 720, title: "OF Test", subTitle: "GitHub Adapter" };
+    // init() must be the first OpenFrame API method called. [10](https://www.servicenow.com/docs/r/api-reference/api-reference.html)
+    var cfg = { width: 420, height: 720, title: "OF Test", subTitle: "GitHub Origin" };
 
-    api.init(
-      config,
-      function initSuccess(snConfig) {
+    window.openFrameAPI.init(
+      cfg,
+      function success(snConfig) {
         initialized = true;
-        log("SUCCESS: init completed. Received config from instance.");
-        log("Returned config name: " + (snConfig?.name || "(none)"));
+        log("SUCCESS: init completed. Returned config name=" + (snConfig && snConfig.name ? snConfig.name : "(none)"));
       },
-      function initFailure(err) {
+      function failure(err) {
         log("FAILED: init failed: " + JSON.stringify(err));
       }
     );
   }
 
-  // 2) Resize OpenFrame (optional)
-  function resizeOpenFrame() {
-    const api = getApi();
-    if (!api) return log("ERROR: openFrameAPI not available.");
-
-    // setSize is documented in OpenFrame client API. [2](https://developer.cisco.com/docs/finesse/getting-started/)
-    api.setSize(420, 720);
-    log("Requested OpenFrame resize to 420x720.");
-  }
-
-  // Helper: Screen pop an incident record
   function screenPopIncident(sysId) {
-    const api = getApi();
-    if (!api) return log("ERROR: openFrameAPI not available.");
     if (!sysId) return log("ERROR: No sys_id to screen pop.");
 
-    // openServiceNowForm is documented to open a record form. [2](https://developer.cisco.com/docs/finesse/getting-started/)[3](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835)
-    api.openServiceNowForm({
+    // openServiceNowForm is documented for opening records. [10](https://www.servicenow.com/docs/r/api-reference/api-reference.html)[11](https://bing.com/search?q=ServiceNow+documentation+CORS+Rules+create+CORS+rule+System+Web+Services+REST+CORS+Rules+domain+methods+headers+allow+credentials)
+    window.openFrameAPI.openServiceNowForm({
       entity: "incident",
       query: "sys_id=" + sysId
     });
-
-    log("Screen pop requested for incident sys_id=" + sysId);
+    log("Screen pop requested for sys_id=" + sysId);
   }
 
-  // 3) Create Incident + Screen Pop (Table API default endpoint)
-  async function createIncidentAndPop() {
-    const api = getApi();
-    if (!api) return log("ERROR: openFrameAPI not available.");
-    if (!initialized) log("WARNING: OpenFrame not initialized yet. Click 'Init OpenFrame' first.");
+  function createIncidentAndPop() {
+    if (!initialized) log("NOTE: Init OpenFrame first (recommended).");
 
-    const user = (document.getElementById("snUser")?.value || "").trim();
-    const pass = (document.getElementById("snPass")?.value || "");
-    const payloadText = (document.getElementById("payload")?.value || "");
+    var base = document.getElementById("snBase").value.trim().replace(/\/$/, "");
+    var user = document.getElementById("snUser").value.trim();
+    var pass = document.getElementById("snPass").value;
+    var rawPayload = document.getElementById("payload").value;
 
-    if (!user || !pass) return log("ERROR: Provide username and password.");
-    if (!payloadText) return log("ERROR: Incident payload is empty.");
+    if (!base) return log("ERROR: ServiceNow base URL is empty.");
+    if (!user || !pass) return log("ERROR: Provide integration username/password (Basic Auth test).");
 
-    let payload;
-    try {
-      payload = JSON.parse(payloadText);
-    } catch (e) {
-      return log("ERROR: Payload is not valid JSON: " + e.message);
-    }
+    var payload;
+    try { payload = JSON.parse(rawPayload); }
+    catch (e) { return log("ERROR: Invalid JSON payload: " + e.message); }
 
-    // ServiceNow Table API: POST /api/now/table/{tableName} inserts one record. [1](https://www.servicenow.com/docs/r/api-reference/rest-apis/c_TableAPI.html)
-    log("POST " + INCIDENT_POST_URL);
+    // Table API default URL format: /api/now/table/{tableName}. [6](https://www.cisco.com/c/en/us/support/docs/contact-center/finesse/221598-understand-uccx-finesse-architecture-dee.html)
+    // POST inserts one record. [6](https://www.cisco.com/c/en/us/support/docs/contact-center/finesse/221598-understand-uccx-finesse-architecture-dee.html)
+    var url = base + "/api/now/table/incident";
+    log("POST " + url);
 
-    try {
-      const res = await fetch(INCIDENT_POST_URL, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          // If you use Authorization header in browser, ensure your CORS rule allows it. [4](https://www.flamingo.run/openframe)
-          "Authorization": "Basic " + btoa(`${user}:${pass}`)
-        },
-        body: JSON.stringify(payload)
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        // Basic Auth is a supported inbound REST authentication method. [5](https://github.com/mayur-hajare/ServiceNow-Documents)
+        "Authorization": "Basic " + btoa(user + ":" + pass)
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function (res) {
+      return res.text().then(function (txt) {
+        return { ok: res.ok, status: res.status, text: txt };
       });
-
-      const text = await res.text();
-      log("Response status: " + res.status);
-
-      if (!res.ok) {
-        log("ERROR: POST failed. Body: " + text);
-        log("TIP: Verify your CORS rule for Table API allows your GitHub origin and required headers/methods. [4](https://www.flamingo.run/openframe)");
+    })
+    .then(function (r) {
+      log("Response HTTP " + r.status);
+      if (!r.ok) {
+        log("ERROR: POST failed. Body: " + r.text);
         return;
       }
 
-      let data = {};
-      try { data = JSON.parse(text); } catch {}
+      var data = {};
+      try { data = JSON.parse(r.text); } catch (e) {}
 
-      const sysId = data?.result?.sys_id;
-      if (!sysId) {
-        log("ERROR: sys_id not found in response: " + text);
-        return;
-      }
+      var sysId = (data && data.result && data.result.sys_id) ? data.result.sys_id : null;
+      if (!sysId) return log("ERROR: sys_id not found in response.");
 
-      lastIncidentSysId = sysId;
+      log("SUCCESS: Incident created sys_id=" + sysId);
+      screenPopIncident(sysId);
+    })
+    .catch(function (e) {
+      log("ERROR: fetch exception: " + e.message);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("btnInit").addEventListener("click", initOpenFrame);
+    document.getElementById("btnCreate").addEventListener("click", createIncidentAndPop);
+    log("Ready.");
+  });
+})();
