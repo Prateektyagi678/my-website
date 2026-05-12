@@ -3,29 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OpenFrame Test Adapter (No Cisco)</title>
+  <title>ServiceNow OpenFrame Test Adapter (No Cisco)</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 12px; }
-    .hint { font-size: 12px; color: #555; }
-    button { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; }
-    textarea { width: 100%; height: 180px; margin-top: 10px; padding: 10px; }
-  </style>
-</head>
-<body>
-  <h2>OpenFrame Test Adapter</h2>
-  <p class="hint">This page is loaded inside ServiceNow OpenFrame. It calls openFrameAPI.init().</p>
-
-  <button id="btnInit">Init OpenFrame</button>
-  <button id="btnCreateIncident">Create Incident + Screen Pop</button>
-  <button id="btnResize">Resize OpenFrame (420x720)</button>
-
-  <textarea id="log" readonly></textarea>
-
-  <!-- Load OpenFrame API from your ServiceNow instance (documented "latest" path). -->
-  <!-- ServiceNow recommends using /scripts/openframe/latest/openFrameAPI.min.js [1](https://developer.cisco.com/docs/finesse/getting-started/)[2](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835) -->
-  <script src="https://dev393388.service-now.com/scripts/openframe/latest/openFrameAPI.min.js"></script>
-
-  <!-- Your adapter logic -->
-  <script src="./adapter.js"></script>
-</body>
-</html>
+    h2 { margin: 0 0 8px; }
+    .hint { font-size: 12px; color: #555; margin: 6px 0 12px; }
+    label { display:block; margin-top: 10px; font-weight: 600; }
+    input, textarea, button { width: 100%; padding: 10px; margin-top: 6px; box-sizing: border-box; }
+    textarea { height: 140px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { cursor: pointer; }
