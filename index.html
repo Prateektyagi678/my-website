@@ -2,79 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ServiceNow OpenFrame Test Adapter (No Cisco)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenFrame Test Adapter (No Cisco)</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 12px; }
+    .hint { font-size: 12px; color: #555; }
     label { display:block; margin-top: 10px; font-weight: 600; }
-    input, button, textarea { width: 100%; padding: 8px; margin-top: 6px; }
-    button { cursor: pointer; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .hint { font-size: 12px; color: #555; margin-top: 4px; }
+    input, textarea, button { width: 100%; padding: 8px; margin-top: 6px; }
     textarea { height: 140px; }
-    .ok { color: #0a7; font-weight: 700; }
-    .err { color: #c00; font-weight: 700; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.6; }
   </style>
 </head>
-
 <body>
-  <h2>OpenFrame Test Adapter (No Cisco)</h2>
+  <h2>ServiceNow OpenFrame Test Adapter (No Cisco)</h2>
   <p class="hint">
-    This page is meant to be loaded inside ServiceNow OpenFrame.
-    It initializes OpenFrame, creates an Incident via Table API, and screen-pops the created record.
+    This page must be loaded inside ServiceNow OpenFrame.
+    It initializes OpenFrame using openFrameAPI.init(). [1](https://developer.cisco.com/docs/finesse/getting-started/)
   </p>
 
-  <label>ServiceNow Instance Base URL</label>
-  <input id="snBase" placeholder="https://dev393388.service-now.com" />
+  <label>ServiceNow Base URL</label>
+  <input id="snBase" value="https://dev393388.service-now.com" />
 
   <div class="row">
-    <div>
-      <label>Integration Username (Basic Auth for testing)</label>
-      <input id="snUser" placeholder="e.g., integration.user" />
-    </div>
-    <div>
-      <label>Integration Password</label>
-      <input id="snPass" type="password" placeholder="password" />
-    </div>
-  </div>
-  <p class="hint">
-    REST API Explorer uses your ServiceNow session, but this external page typically needs credentials to call Table API.
-    Ensure your user has permission to create incidents. [4](https://www.servicenow.com/docs/r/customer-service-management/t_CreateAnOpenFrameConfiguration.html?contentId=H3mcEQnL9UwoKyCTFamIFQ)
-  </p>
-
-  <label>Incident Payload (Table API POST /api/now/v1/table/incident)</label>
-  <textarea id="payload">
-{
-  "short_description": "OpenFrame mock inbound call test",
-  "description": "Created from external OpenFrame test adapter page.",
-  "contact_type": "phone"
-}
-  </textarea>
-
-  <div class="row">
-    <button id="btnInit">1) Init OpenFrame</button>
-    <button id="btnCreate">2) Create Incident + Screen Pop</button>
+    <button id="btnInit" disabled>1) Init OpenFrame</button>
+    <button id="btnResize" disabled>2) Resize OpenFrame (420x720)</button>
   </div>
 
-  <div class="row">
-    <button id="btnPop">3) Screen Pop Last Incident</button>
-    <button id="btnResize">4) Resize OpenFrame (420x720)</button>
-  </div>
-
-  <label>Status / Log</label>
+  <label>Log</label>
   <textarea id="log" readonly></textarea>
 
-  <!-- Load ServiceNow OpenFrame API from your instance (recommended "latest") -->
-  <script>
-    // IMPORTANT: Replace dev393388 with your real instance subdomain.
-    // ServiceNow recommends using: /scripts/openframe/latest/openFrameAPI.min.js [1](https://developer.cisco.com/docs/finesse/getting-started/)[2](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835)
-    const snScript = document.createElement('script');
-    snScript.src = "https://dev393388.service-now.com/scripts/openframe/latest/openFrameAPI.min.js";
-    snScript.onload = () => console.log("OpenFrame API loaded");
-    snScript.onerror = () => console.error("Failed to load OpenFrame API library");
-    document.head.appendChild(snScript);
-  </script>
+  <!-- 1) Load OpenFrame API from your ServiceNow instance (recommended "latest") [1](https://developer.cisco.com/docs/finesse/getting-started/)[2](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835) -->
+  <script src="https://dev393388.service-now.com/scripts/openframe/latest/openFrameAPI.min.js"></script>
 
-  <script src="adapter.js"></script>
+  <!-- 2) Your adapter logic -->
+  <script src="./adapter.js"></script>
 </body>
 </html>
