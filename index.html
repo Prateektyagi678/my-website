@@ -2,41 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>OpenFrame Test Adapter (No Cisco)</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 12px; }
     .hint { font-size: 12px; color: #555; }
-    label { display:block; margin-top: 10px; font-weight: 600; }
-    input, textarea, button { width: 100%; padding: 8px; margin-top: 6px; }
-    textarea { height: 140px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: 0.6; }
+    button { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; }
+    textarea { width: 100%; height: 180px; margin-top: 10px; padding: 10px; }
   </style>
 </head>
 <body>
-  <h2>ServiceNow OpenFrame Test Adapter (No Cisco)</h2>
-  <p class="hint">
-    This page must be loaded inside ServiceNow OpenFrame.
-    It initializes OpenFrame using openFrameAPI.init(). [1](https://developer.cisco.com/docs/finesse/getting-started/)
-  </p>
+  <h2>OpenFrame Test Adapter</h2>
+  <p class="hint">This page is loaded inside ServiceNow OpenFrame. It calls openFrameAPI.init().</p>
 
-  <label>ServiceNow Base URL</label>
-  <input id="snBase" value="https://dev393388.service-now.com" />
+  <button id="btnInit">Init OpenFrame</button>
+  <button id="btnResize">Resize OpenFrame (420x720)</button>
 
-  <div class="row">
-    <button id="btnInit" disabled>1) Init OpenFrame</button>
-    <button id="btnResize" disabled>2) Resize OpenFrame (420x720)</button>
-  </div>
-
-  <label>Log</label>
   <textarea id="log" readonly></textarea>
 
-  <!-- 1) Load OpenFrame API from your ServiceNow instance (recommended "latest") [1](https://developer.cisco.com/docs/finesse/getting-started/)[2](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835) -->
+  <!-- Load OpenFrame API from your ServiceNow instance (documented "latest" path). -->
+  <!-- ServiceNow recommends using /scripts/openframe/latest/openFrameAPI.min.js [1](https://developer.cisco.com/docs/finesse/getting-started/)[2](https://community.cisco.com/t5/contact-center/workflow-for-uccx-finesse-api/td-p/4540835) -->
   <script src="https://dev393388.service-now.com/scripts/openframe/latest/openFrameAPI.min.js"></script>
 
-  <!-- 2) Your adapter logic -->
+  <!-- Your adapter logic -->
   <script src="./adapter.js"></script>
 </body>
 </html>
